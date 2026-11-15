@@ -1,37 +1,15 @@
 
 pipeline {
-    agent {
-        docker {
-            image 'python:3.12'
-            args '-u root'
-        }
-    }
+    agent any
 
     stages {
-
-        stage('Check Python') {
-            steps {
-                sh '''
-                    python --version
-                    pip --version
-                '''
-            }
-        }
-
-        stage('Create Virtual Environment') {
-            steps {
-                sh '''
-                    python -m venv venv
-                    ./venv/bin/python --version
-                '''
-            }
-        }
 
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    ./venv/bin/python -m pip install --upgrade pip
-                    ./venv/bin/python -m pip install -r requirements.txt
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
                 '''
             }
         }
@@ -39,8 +17,8 @@ pipeline {
         stage('Run Flask Application') {
             steps {
                 sh '''
-                    ./venv/bin/python -m py_compile app.py
-                    echo "Flask application validation successful!"
+                    . venv/bin/activate
+                    python app.py
                 '''
             }
         }
@@ -48,7 +26,7 @@ pipeline {
 
     post {
         success {
-            echo 'Flask application build successful!'
+            echo 'Flask application started successfully!'
         }
 
         failure {
