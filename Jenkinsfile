@@ -1,11 +1,9 @@
-pipeline {
 
+pipeline {
 
     agent any
 
-
     stages {
-
 
         stage('Create Virtual Environment') {
             steps {
@@ -16,34 +14,31 @@ pipeline {
             }
         }
 
-
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    ./venv/bin/python -m pip install --upgrade pip
-                    ./venv/bin/pip install -r requirements.txt
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
                 '''
             }
         }
-
 
         stage('Run Flask Application') {
             steps {
                 sh '''
-                    ./venv/bin/python app.py 
+                    . venv/bin/activate
+                    python -m py_compile app.py
+                    echo "Flask application validation successful!"
                 '''
             }
         }
-
-
     }
-
 
     post {
         success {
-            echo 'Flask application started successfully!'
+            echo 'Flask application build successful!'
         }
-
 
         failure {
             echo 'Pipeline execution failed!'
